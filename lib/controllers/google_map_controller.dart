@@ -22,8 +22,9 @@ import 'package:weather_app/common/app_pop_ups.dart';
 import 'package:weather_app/common/constants.dart';
 import 'package:weather_app/common/helpers.dart';
 import 'package:weather_app/common/styles.dart';
-import 'package:weather_app/models/weather_response_model.dart';
+import 'package:weather_app/models/curent_weather_response_model.dart';
 import 'package:weather_app/my_application.dart';
+import 'package:weather_app/network_services.dart';
 
 import '../common/app_alert_bottom_sheet.dart';
 import '../common/common_widgets.dart';
@@ -36,7 +37,6 @@ class MyGoogleMapController extends GetxController {
   RxBool isLoading = false.obs;
   late BitmapDescriptor sourceIcon;
   late BitmapDescriptor destinationIcon;
-  final dioObj = dio.Dio();
 
   ///"°F"
   var selectedTemperatureUnit = "°C".obs;
@@ -65,7 +65,6 @@ class MyGoogleMapController extends GetxController {
 
   RxList<MarkerData> customMarkers = <MarkerData>[].obs;
 
-/*  List<MarkerData> customMarkers = [];*/
 /////////////////////////////
   void initialize({required PickResult fromLoc, required PickResult toLoc}) {
     fromLocationLatLng = LatLng(fromLoc.geometry?.location.lat ?? 30.3551585,
@@ -79,9 +78,6 @@ class MyGoogleMapController extends GetxController {
 
   void onMapCreated(GoogleMapController controller) {
     googleMapController = controller;
-    /* if (!isZoomed) {
-      isZoomed = true;
-    }*/
     animateCameraToBounds();
   }
 
@@ -121,8 +117,10 @@ class MyGoogleMapController extends GetxController {
         for (var element in finalMap.entries) {
           LatLng latLng =
               LatLng(element.value.latitude, element.value.longitude);
-          WeatherResponseModel? weatherResponseModel =
-              await getWeatherConditionFromLatLng(latLng: latLng);
+          CurrentWeatherResponseModel? weatherResponseModel =
+              await NetworkServices.getCurrentWeatherConditionFromLatLng(
+                  latLng: latLng,
+                  selectedTemperatureUnit: selectedTemperatureUnit.value);
           customMarkers.add(MarkerData(
               marker: Marker(
                   onTap: () {
@@ -139,12 +137,16 @@ class MyGoogleMapController extends GetxController {
         }
 
         ///adding start and end point
-        WeatherResponseModel fromWeatherResponseModel =
-            await getWeatherConditionFromLatLng(latLng: fromLocationLatLng) ??
-                WeatherResponseModel();
-        WeatherResponseModel toWeatherResponseModel =
-            await getWeatherConditionFromLatLng(latLng: toLocationLatLng) ??
-                WeatherResponseModel();
+        CurrentWeatherResponseModel fromWeatherResponseModel =
+            await NetworkServices.getCurrentWeatherConditionFromLatLng(
+                    latLng: fromLocationLatLng,
+                    selectedTemperatureUnit: selectedTemperatureUnit.value) ??
+                CurrentWeatherResponseModel();
+        CurrentWeatherResponseModel toWeatherResponseModel =
+            await NetworkServices.getCurrentWeatherConditionFromLatLng(
+                    latLng: toLocationLatLng,
+                    selectedTemperatureUnit: selectedTemperatureUnit.value) ??
+                CurrentWeatherResponseModel();
 
         customMarkers.add(MarkerData(
             marker: Marker(
@@ -200,74 +202,7 @@ class MyGoogleMapController extends GetxController {
     }
   }
 
-  Future<WeatherResponseModel?> getWeatherConditionFromLatLng(
-      {required LatLng latLng, bool showAlert = false}) async {
-    if (showAlert) {
-      isLoading.value = true;
-    }
-    try {
-      var response = await dioObj.get(AppConstants.currentWeatherApi,
-          options: dio.Options(headers: {"Content-Type": 'application/json'}),
-          queryParameters: {
-            "lat": latLng.latitude,
-            "lon": latLng.longitude,
-            "appId": AppConstants.openWeatherApiKey,
-            "units":
-                selectedTemperatureUnit.value == '°C' ? 'metric' : 'imperial'
-          });
-      if (showAlert) {
-        isLoading.value = false;
-      }
-      if (response.statusCode == 200 && response.data != null) {
-        printWrapped("got weather data...");
-        printWrapped(response.data.toString());
-        return WeatherResponseModel.fromJson(response.data);
-      } else {
-        if (showAlert) {
-          AppPopUps.showDialogContent(title: 'Failed to get weather condition');
-        }
-        return null;
-      }
-    } catch (e) {
-      isLoading.value = false;
-
-      AppPopUps.showDialogContent(
-          title: 'Failed to connect to server.', dialogType: DialogType.ERROR);
-    }
-    return null;
-  }
-
-  void addMarker(
-      {BitmapDescriptor? bitMapIconDescriptor,
-      required WeatherResponseModel? weatherResponseModel}) {
-    markers.add(Marker(
-        // This marker id can be anything that uniquely identifies each marker.
-        markerId: MarkerId((weatherResponseModel?.id ?? 0).toString()),
-        position: LatLng(weatherResponseModel?.coord?.lat ?? 0.0,
-            weatherResponseModel?.coord?.lon ?? 0.0),
-        infoWindow: InfoWindow(
-            title: weatherResponseModel?.name ?? '-',
-            snippet:
-                "${weatherResponseModel?.weather?[0].main ?? '-'} ${weatherResponseModel?.main?.temp ?? 0} ${selectedTemperatureUnit.value}"),
-        icon: bitMapIconDescriptor ?? BitmapDescriptor.defaultMarker,
-        onTap: () {
-          openBottomSheet(weather: weatherResponseModel);
-        }));
-  }
-
-  ///to get network icon for weather condition
-  Future<BitmapDescriptor> _buildMarkerIcon({required String iconName}) async {
-    printWrapped("getting image");
-    printWrapped(iconName);
-    final http.Response response = await http
-        .get(Uri.parse("http://openweathermap.org/img/wn/$iconName@4x.png"));
-    BitmapDescriptor bitmapDescriptor =
-        BitmapDescriptor.fromBytes(response.bodyBytes);
-    // And return the product
-    return bitmapDescriptor;
-  }
-
-  void openBottomSheet({required WeatherResponseModel? weather}) {
+  void openBottomSheet({required CurrentWeatherResponseModel? weather}) {
     String sunRiseTime = DateFormat('hh:mm:ss').format(
         DateTime.fromMillisecondsSinceEpoch(
             (weather?.sys?.sunrise!.toInt())! * (1000)));

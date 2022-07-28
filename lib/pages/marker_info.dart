@@ -12,11 +12,11 @@ import 'package:weather_app/common/common_widgets.dart';
 
 import 'package:weather_app/common/styles.dart';
 import 'package:weather_app/controllers/google_map_controller.dart';
-import 'package:weather_app/models/weather_response_model.dart';
+import 'package:weather_app/models/curent_weather_response_model.dart';
 
 class MarkerInfo extends StatefulWidget {
   Function getBitmapImage;
-  WeatherResponseModel weatherResponseModel;
+  CurrentWeatherResponseModel weatherResponseModel;
   GlobalKey markerKey = GlobalKey();
 
   MyGoogleMapController googleMapController = Get.find();

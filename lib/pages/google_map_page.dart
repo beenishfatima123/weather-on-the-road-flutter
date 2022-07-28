@@ -10,11 +10,12 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
 import 'package:weather_app/common/app_pop_ups.dart';
 import 'package:weather_app/common/helpers.dart';
+import 'package:weather_app/network_services.dart';
 import '../common/loading_widget.dart';
 import '../common/spaces_boxes.dart';
 import '../common/styles.dart';
 import '../controllers/google_map_controller.dart';
-import '../models/weather_response_model.dart';
+import '../models/curent_weather_response_model.dart';
 import 'marker_info.dart';
 
 class GoogleMapPage extends GetView<MyGoogleMapController> {
@@ -63,10 +64,16 @@ class GoogleMapPage extends GetView<MyGoogleMapController> {
                     polylines: controller.polylines,
                     onMapCreated: controller.onMapCreated,
                     onLongPress: (LatLng latLng) async {
-                      WeatherResponseModel? weatherResponseModel =
-                          await controller.getWeatherConditionFromLatLng(
-                                  latLng: latLng, showAlert: true) ??
-                              WeatherResponseModel();
+                      controller.isLoading.value = true;
+                      CurrentWeatherResponseModel? weatherResponseModel =
+                          await NetworkServices
+                                  .getCurrentWeatherConditionFromLatLng(
+                                      latLng: latLng,
+                                      showAlert: true,
+                                      selectedTemperatureUnit: controller
+                                          .selectedTemperatureUnit.value) ??
+                              CurrentWeatherResponseModel();
+
                       controller.customMarkers.add(
                         MarkerData(
                           marker: Marker(
@@ -84,6 +91,7 @@ class GoogleMapPage extends GetView<MyGoogleMapController> {
                               weatherResponseModel: weatherResponseModel),
                         ),
                       );
+                      controller.isLoading.value = false;
                     },
                   );
                 }),

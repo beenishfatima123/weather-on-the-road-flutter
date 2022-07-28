@@ -3,9 +3,6 @@ import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:weather_app/common/spaces_boxes.dart';
 import 'package:weather_app/common/styles.dart';
-import 'package:weather_app/models/weather_response_model.dart';
-import 'package:weather_app/pages/marker_info.dart';
-
 import '../../../../common/loading_widget.dart';
 import '../controllers/pick_place_controller.dart';
 import 'google_map_page.dart';

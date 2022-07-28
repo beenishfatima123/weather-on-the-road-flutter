@@ -15,6 +15,10 @@ String formatDateTime(DateTime? dateTime) {
   return DateFormat('dd-MM-yyyy').format(dateTime ?? DateTime.now());
 }
 
+String formatUnixDateTime({required int? unixDateTime}) {
+  return "";
+}
+
 int daysDifference({required DateTime from, required DateTime to}) {
 // get the difference in term of days, and not just a 24h difference
   from = DateTime(from.year, from.month, from.day);

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:weather_app/pages/current_weather_page.dart';
 import 'package:weather_app/pages/pick_places_page.dart';
 
 import 'google_map_page.dart';
@@ -23,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void gotoRelevantScreenOnUserType() {
-    Get.offNamed(PickPlacePage.id);
+    Get.offNamed(CurrentWeatherPage.id);
     /*if (UserDefaults.getUserSession() != null) {
       Get.offNamed(DashBoardPage.id);
     } else {
