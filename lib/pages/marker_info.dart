@@ -19,8 +19,6 @@ class MarkerInfo extends StatefulWidget {
   CurrentWeatherResponseModel weatherResponseModel;
   GlobalKey markerKey = GlobalKey();
 
-  MyGoogleMapController googleMapController = Get.find();
-
   MarkerInfo(
       {Key? key,
       required this.getBitmapImage,
@@ -109,6 +107,6 @@ class _MarkerInfoState extends State<MarkerInfo> {
 
   String _getTemperature() {
     var temp = (widget.weatherResponseModel.main?.temp ?? 0).toString();
-    return "$temp ${widget.googleMapController.selectedTemperatureUnit.value}";
+    return "$temp";
   }
 }

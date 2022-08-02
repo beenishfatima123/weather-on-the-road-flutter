@@ -54,13 +54,15 @@ dependencies:
   ##dio_cache_interceptor: ^3.3.0
   shared_preferences: ^2.0.6
   geocoder2: ^1.1.2
-
-
+  hive: ^2.2.3
+  hive_flutter:
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  build_runner:
+  hive_generator:
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

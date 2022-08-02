@@ -126,6 +126,9 @@ class NetworkServices {
   }
 
   static Future<LatLng> getUserLocation() async {
+    if (!(await checkLocationPermission())) {
+      await Geolocator.requestPermission();
+    }
     var position = await GeolocatorPlatform.instance.getCurrentPosition(
         locationSettings:
             const LocationSettings(accuracy: LocationAccuracy.high));

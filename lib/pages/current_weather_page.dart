@@ -12,6 +12,7 @@ import 'package:weather_app/models/five_day_weather_forecast_response_model.dart
 import 'package:weather_app/models/one_call_weather_response_model.dart';
 import 'package:weather_app/my_application.dart';
 import 'package:weather_app/pages/pick_places_page.dart';
+import 'package:weather_app/pages/saved_weather_page.dart';
 import 'package:weather_app/pages/weather_page_widgets.dart';
 
 import '../../../../common/loading_widget.dart';
@@ -269,6 +270,7 @@ class CurrentWeatherPage extends GetView<CurrentWeatherController>
         await Get.toNamed(PickPlacePage.id);
         break;
       case 1:
+        await Get.toNamed(SavedWeatherPage.id);
         break;
     }
   }

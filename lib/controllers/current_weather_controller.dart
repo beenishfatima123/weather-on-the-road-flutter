@@ -18,6 +18,7 @@ class CurrentWeatherController extends GetxController {
   var backGroundWeatherType = WeatherType.hazy.obs;
 
   Future<void> getWeatherFromApi({bool refresh = false}) async {
+    isLoading.value = true;
     weatherUnit.value = await UserDefaults.getWeatherUnit() ?? "°C";
     LatLng coord = await NetworkServices.getUserLocation();
     GeoData geoData =
@@ -44,8 +45,8 @@ class CurrentWeatherController extends GetxController {
       bool result = await UserDefaults.saveOneCallWeather(
           oneCallWeatherResponseModel.value.value!);
       printWrapped("weather save result $result");
-      isLoading.value = false;
     }
+    isLoading.value = false;
   }
 
   void _changeBackgroundAccordingToWeather(int id) {

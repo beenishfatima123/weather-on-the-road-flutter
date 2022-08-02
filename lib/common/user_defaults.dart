@@ -8,8 +8,10 @@ import 'helpers.dart';
 
 class UserDefaults {
   static SharedPreferences? sharedPreferences;
+  static SharedPreferences? mapPreference;
 
   static Future<SharedPreferences?> getPref() async {
+    sharedPreferences ??= await SharedPreferences.getInstance();
     sharedPreferences ??= await SharedPreferences.getInstance();
     return sharedPreferences;
   }

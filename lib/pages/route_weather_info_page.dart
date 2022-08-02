@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
 import 'package:weather_app/common/app_pop_ups.dart';
 import 'package:weather_app/common/helpers.dart';
+import 'package:weather_app/controllers/route_weather_info_controller.dart';
 import 'package:weather_app/models/custom_weather_info_model.dart';
 import 'package:weather_app/models/my_lat_lng.dart';
 import 'package:weather_app/network_services.dart';
@@ -17,11 +18,10 @@ import '../controllers/google_map_controller.dart';
 import '../models/curent_weather_response_model.dart';
 import 'marker_info.dart';
 
-class GoogleMapPage extends GetView<MyGoogleMapController> {
-  GoogleMapPage({Key? key}) : super(key: key);
-  static const id = '/GoogleMapPage';
-  final PickResult? fromLoc = Get.arguments[0];
-  final PickResult? toLoc = Get.arguments[1];
+class RouteWeatherInfoPage extends GetView<RouteWeatherInfoController> {
+  RouteWeatherInfoPage({Key? key}) : super(key: key);
+  static const id = '/RouteWeatherInfoPage';
+  CustomWeatherInfoModel? weatherInfoModel = Get.arguments;
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +29,10 @@ class GoogleMapPage extends GetView<MyGoogleMapController> {
 
     return Scaffold(
       appBar: myAppBar(goBack: true, title: 'Weather'),
-      body: GetX<MyGoogleMapController>(
+      body: GetX<RouteWeatherInfoController>(
         initState: (state) {
-          if ((fromLoc != null) && (toLoc != null)) {
-            controller.initialize(fromLoc: fromLoc!, toLoc: toLoc!);
+          if (weatherInfoModel != null) {
+            controller.initialize(weatherInfoModel: weatherInfoModel!);
           }
         },
         builder: (_) {
@@ -41,7 +41,7 @@ class GoogleMapPage extends GetView<MyGoogleMapController> {
               children: [
                 CustomGoogleMapMarkerBuilder(
                   screenshotDelay: const Duration(seconds: 2),
-                  customMarkers: controller.customMarkers.keys.toList(),
+                  customMarkers: controller.customMarkers,
                   builder: (BuildContext context, Set<Marker>? markers) {
                     if (markers != null) {
                       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -76,7 +76,7 @@ class GoogleMapPage extends GetView<MyGoogleMapController> {
                                               .selectedTemperatureUnit.value) ??
                                   CurrentWeatherResponseModel();
 
-                          controller.customMarkers[MarkerData(
+                          controller.customMarkers.add(MarkerData(
                             marker: Marker(
                                 onTap: () {
                                   controller.openBottomSheet(
@@ -90,58 +90,11 @@ class GoogleMapPage extends GetView<MyGoogleMapController> {
                             child: MarkerInfo(
                                 getBitmapImage: (img, model) {},
                                 weatherResponseModel: weatherResponseModel),
-                          )] = weatherResponseModel;
+                          ));
 
                           controller.isLoading.value = false;
                         },
                       )),
-                      InkWell(
-                        onTap: () async {
-                          CustomWeatherInfoModel infoModel = CustomWeatherInfoModel(
-                              id: "${fromLoc?.name ?? ''}-${toLoc?.name ?? ''}",
-                              polylineCoordinates: controller
-                                  .polylineCoordinates
-                                  .map((e) => MyLatLng(
-                                      lng: e.longitude, lat: e.latitude))
-                                  .toList(),
-                              weathersList:
-                                  controller.customMarkers.values.toList());
-                          await HiveDb.addWeatherToBox(infoModel);
-                          AppPopUps.showSnackBar(
-                              message: 'Weather info saved', context: context);
-                          // var list = await HiveDb.getWeatherFromBox(id: 'idA');
-
-                          /*var list = await HiveDb.getListOfBoxWeather();
-                          printWrapped("resultttt");
-                          printWrapped(list.toString());*/
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 12, horizontal: 16),
-                          decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10)),
-                              color: AppColor.green),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Save route',
-                                style: AppTextStyles.textStyleBoldBodyMedium
-                                    .copyWith(color: AppColor.whiteColor),
-                              ),
-                              hSpace,
-                              const Icon(
-                                Icons.data_saver_on,
-                                color: AppColor.whiteColor,
-                                size: 18,
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
                     ],
                   );
                 }),

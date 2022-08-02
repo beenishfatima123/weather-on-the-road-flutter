@@ -25,6 +25,7 @@ import 'package:weather_app/common/hive_db.dart';
 import 'package:weather_app/common/styles.dart';
 import 'package:weather_app/common/user_defaults.dart';
 import 'package:weather_app/models/curent_weather_response_model.dart';
+import 'package:weather_app/models/custom_weather_info_model.dart';
 import 'package:weather_app/my_application.dart';
 import 'package:weather_app/network_services.dart';
 import 'package:weather_app/pages/current_weather_page.dart';
@@ -37,7 +38,7 @@ import '../pages/marker_info.dart';
 
 List<PointLatLng> getList(int n, List<PointLatLng> source) => source.sample(n);
 
-class MyGoogleMapController extends GetxController {
+class RouteWeatherInfoController extends GetxController {
   RxBool isLoading = false.obs;
 
   ///"°F"
@@ -65,21 +66,16 @@ class MyGoogleMapController extends GetxController {
     zoom: 14.4746,
   );
 
-  RxMap<MarkerData, CurrentWeatherResponseModel> customMarkers =
-      <MarkerData, CurrentWeatherResponseModel>{}.obs;
+  RxList<MarkerData> customMarkers = <MarkerData>[].obs;
 
-  //RxBool isRouteAlreadySaved = true.obs;
+  CustomWeatherInfoModel? weatherInfoModel;
 
-/////////////////////////////
   Future<void> initialize(
-      {required PickResult fromLoc, required PickResult toLoc}) async {
-    fromLocationLatLng = LatLng(fromLoc.geometry?.location.lat ?? 30.3551585,
-        fromLoc.geometry?.location.lng ?? 74.2557278);
-    toLocationLatLng = LatLng(toLoc.geometry?.location.lat ?? 30.3551585,
-        toLoc.geometry?.location.lng ?? 74.2557278);
+      {required CustomWeatherInfoModel weatherInfoModel}) async {
+    this.weatherInfoModel = weatherInfoModel;
     selectedTemperatureUnit.value = await UserDefaults.getWeatherUnit() ?? "°C";
+
     setPolyLines();
-//  isRouteAlreadySaved.value= await HiveDb.checkIfAlreadySaved();
   }
 
   bool isZoomed = false;
@@ -92,124 +88,43 @@ class MyGoogleMapController extends GetxController {
   setPolyLines() async {
     isLoading.value = true;
     try {
-      PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-        AppConstants.googleMapApiKey,
-        PointLatLng(fromLocationLatLng.latitude, fromLocationLatLng.longitude),
-        PointLatLng(toLocationLatLng.latitude, toLocationLatLng.longitude),
-      );
-      if (result.points.isNotEmpty) {
-        // loop through all PointLatLng points and convert them
-        // to a list of LatLng, required by the Polyline
-        printWrapped(result.points.first.toString());
-        final splittedList = getList(result.points.length ~/ 20, result.points);
-        Map<String, PointLatLng> finalMap = {"x": result.points.first};
-
-        ///distance filter
-        for (var pointLatLng in splittedList) {
-          int distance = Geolocator.distanceBetween(
-                  finalMap.values.last.latitude,
-                  finalMap.values.last.longitude,
-                  pointLatLng.latitude,
-                  pointLatLng.longitude) ~/
-              1000;
-          if (distance > 50) {
-            ///every 50 km
-            finalMap[distance.toString()] = pointLatLng;
-          }
-        }
-
-        ///adding markers
-
-        for (var element in finalMap.entries) {
-          LatLng latLng =
-              LatLng(element.value.latitude, element.value.longitude);
-          CurrentWeatherResponseModel? weatherResponseModel =
-              await NetworkServices.getCurrentWeatherConditionFromLatLng(
-                  latLng: latLng,
-                  selectedTemperatureUnit: selectedTemperatureUnit.value);
-
-          customMarkers[MarkerData(
-                  marker: Marker(
-                      onTap: () {
-                        printWrapped("on tapppp");
-                        openBottomSheet(weather: weatherResponseModel);
-                      },
-                      markerId:
-                          MarkerId((weatherResponseModel?.id ?? 0).toString()),
-                      position: LatLng(weatherResponseModel?.coord?.lat ?? 0.0,
-                          weatherResponseModel?.coord?.lon ?? 0.0)),
-                  child: MarkerInfo(
-                      getBitmapImage: (img, model) {},
-                      weatherResponseModel: weatherResponseModel!))] =
-              weatherResponseModel;
-        }
-
-        ///adding start and end point
-        CurrentWeatherResponseModel fromWeatherResponseModel =
-            await NetworkServices.getCurrentWeatherConditionFromLatLng(
-                    latLng: fromLocationLatLng,
-                    selectedTemperatureUnit: selectedTemperatureUnit.value) ??
-                CurrentWeatherResponseModel();
-        CurrentWeatherResponseModel toWeatherResponseModel =
-            await NetworkServices.getCurrentWeatherConditionFromLatLng(
-                    latLng: toLocationLatLng,
-                    selectedTemperatureUnit: selectedTemperatureUnit.value) ??
-                CurrentWeatherResponseModel();
-
-        ///adding to marker
-        customMarkers[MarkerData(
+      ///adding markers
+      printWrapped('list size');
+      print(weatherInfoModel?.weathersList.toString());
+      weatherInfoModel?.weathersList?.forEach((element) {
+        printWrapped("on tapppp");
+        customMarkers.add(MarkerData(
             marker: Marker(
                 onTap: () {
-                  openBottomSheet(weather: toWeatherResponseModel);
+                  openBottomSheet(weather: element);
                 },
-                markerId: MarkerId((toWeatherResponseModel.id ?? 0).toString()),
-                position: LatLng(toWeatherResponseModel.coord?.lat ?? 0.0,
-                    toWeatherResponseModel.coord?.lon ?? 0.0)),
+                markerId: MarkerId((element.id ?? 0).toString()),
+                position: LatLng(
+                    element.coord?.lat ?? 0.0, element.coord?.lon ?? 0.0)),
             child: MarkerInfo(
                 getBitmapImage: (img, model) {},
-                weatherResponseModel:
-                    toWeatherResponseModel))] = toWeatherResponseModel;
+                weatherResponseModel: element)));
+      });
 
-        ///adding from marker
-        customMarkers[MarkerData(
-                marker: Marker(
-                    onTap: () {
-                      openBottomSheet(weather: fromWeatherResponseModel);
-                    },
-                    markerId:
-                        MarkerId((fromWeatherResponseModel.id ?? 0).toString()),
-                    position: LatLng(fromWeatherResponseModel.coord?.lat ?? 0.0,
-                        fromWeatherResponseModel.coord?.lon ?? 0.0)),
-                child: MarkerInfo(
-                    getBitmapImage: (img, model) {},
-                    weatherResponseModel: fromWeatherResponseModel))] =
-            fromWeatherResponseModel;
+      Polyline polyline = Polyline(
+          polylineId: const PolylineId("poly"),
+          color: const Color.fromARGB(255, 40, 122, 198),
+          points: weatherInfoModel?.polylineCoordinates
+                  ?.map((e) => LatLng(
+                      (e.lat ?? 0.0).toDouble(), (e.lng ?? 0.0).toDouble()))
+                  .toList() ??
+              []);
+      polylines.add(polyline);
 
-        for (var point in result.points) {
-          LatLng latLng = LatLng(point.latitude, point.longitude);
-          polylineCoordinates.add(latLng);
-        }
+      isLoading.value = false;
 
-        Polyline polyline = Polyline(
-            polylineId: const PolylineId("poly"),
-            color: const Color.fromARGB(255, 40, 122, 198),
-            points: polylineCoordinates);
-        polylines.add(polyline);
-
-        isLoading.value = false;
-
-        WidgetsBinding.instance.addPostFrameCallback((_) => {
-              AppPopUps.showDialogContent(
-                  title: 'Long press on map to get weather information',
-                  dialogType: DialogType.INFO)
-            });
-      } else {
-        isLoading.value = false;
-        print("pointssss");
-        print("result point is empty");
-        AppPopUps.showDialogContent(title: 'No route found');
-      }
+      WidgetsBinding.instance.addPostFrameCallback((_) => {
+            AppPopUps.showDialogContent(
+                title: 'Long press on map to get weather information',
+                dialogType: DialogType.INFO)
+          });
     } catch (e) {
+      printWrapped("error $e");
       isLoading.value = false;
       AppPopUps.showDialogContent(title: 'Failed to connect');
     }
