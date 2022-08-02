@@ -48,13 +48,13 @@ mixin WeatherWidgetMixin {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Flexible(
+          /* Flexible(
             child: Text(
                 getDateFromUnix(unixDateTime: dailyWeather?.dt?.toInt()),
                 style: AppTextStyles.textStyleNormalBodyXSmall
                     .copyWith(color: AppColor.whiteColor)),
           ),
-          hSpace,
+          hSpace,*/
           Expanded(
             flex: 4,
             child: Row(

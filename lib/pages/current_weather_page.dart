@@ -1,15 +1,11 @@
 import 'dart:ui';
-
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_weather_bg_null_safety/flutter_weather_bg.dart';
-import 'package:geocoder2/geocoder2.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:weather_app/common/common_widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:weather_app/common/helpers.dart';
 import 'package:weather_app/common/styles.dart';
-import 'package:weather_app/models/five_day_weather_forecast_response_model.dart';
-import 'package:weather_app/models/one_call_weather_response_model.dart';
 import 'package:weather_app/my_application.dart';
 import 'package:weather_app/pages/pick_places_page.dart';
 import 'package:weather_app/pages/saved_weather_page.dart';
@@ -18,7 +14,6 @@ import 'package:weather_app/pages/weather_page_widgets.dart';
 import '../../../../common/loading_widget.dart';
 import '../common/spaces_boxes.dart';
 import '../controllers/current_weather_controller.dart';
-import '../network_services.dart';
 
 class CurrentWeatherPage extends GetView<CurrentWeatherController>
     with WeatherWidgetMixin {
@@ -212,6 +207,84 @@ class CurrentWeatherPage extends GetView<CurrentWeatherController>
                               ),
                             ),
                           ),
+
+                          vSpace,
+                          vSpace,
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8.0, horizontal: 20),
+                            child: StaggeredGrid.count(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                              children: [
+                                getInfoWidget(
+                                  icon: Icons.hotel_class_outlined,
+                                  key: "Temp.",
+                                  value:
+                                      ("${controller.oneCallWeatherResponseModel.value.value?.current?.temp?.toInt() ?? 0} ${controller.weatherUnit.value}"),
+                                ),
+                                getInfoWidget(
+                                  icon: Icons.air,
+                                  key: "Humidity",
+                                  value:
+                                      ("${controller.oneCallWeatherResponseModel.value.value?.current?.humidity?.toInt() ?? 0} %"),
+                                ),
+                                getInfoWidget(
+                                  icon: Icons.remove_red_eye_outlined,
+                                  key: "Visibility",
+                                  value:
+                                      ("${controller.oneCallWeatherResponseModel.value.value?.current?.visibility ?? 0} meter "),
+                                ),
+                                getInfoWidget(
+                                  icon: Icons.compress,
+                                  key: "Pressure",
+                                  value:
+                                      ("${controller.oneCallWeatherResponseModel.value.value?.current?.pressure ?? 0}  hPa"),
+                                ),
+                                getInfoWidget(
+                                  icon: Icons.compress,
+                                  key: "Wind Speed",
+                                  value:
+                                      ("${controller.oneCallWeatherResponseModel.value.value?.current?.windSpeed ?? 0}  m/s"),
+                                ),
+                                getInfoWidget(
+                                  icon: Icons.cloud,
+                                  key: "Clouds",
+                                  value:
+                                      ("${controller.oneCallWeatherResponseModel.value.value?.current?.clouds ?? 0}  %"),
+                                ),
+                                getInfoWidget(
+                                  icon: Icons.sunny,
+                                  key: "Sun rise",
+                                  value: DateFormat('hh:mm:ss a').format(
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                          (controller
+                                                  .oneCallWeatherResponseModel
+                                                  .value
+                                                  .value
+                                                  ?.current
+                                                  ?.sunrise!
+                                                  .toInt())! *
+                                              (1000))),
+                                ),
+                                getInfoWidget(
+                                  icon: Icons.nightlight,
+                                  key: "Sun set",
+                                  value: DateFormat('hh:mm:ss a').format(
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                          (controller
+                                                  .oneCallWeatherResponseModel
+                                                  .value
+                                                  .value
+                                                  ?.current
+                                                  ?.sunset!
+                                                  .toInt())! *
+                                              (1000))),
+                                )
+                              ],
+                            ),
+                          )
                         ],
                       ),
                     ),
@@ -252,18 +325,6 @@ class CurrentWeatherPage extends GetView<CurrentWeatherController>
     );
   }
 
-  void _showPopupMenu() async {
-    await showMenu(
-      context: myContext!,
-      position: RelativeRect.fromLTRB(100, 100, 100, 100),
-      items: [
-        PopupMenuItem<String>(child: const Text('Doge'), value: 'Doge'),
-        PopupMenuItem<String>(child: const Text('Lion'), value: 'Lion'),
-      ],
-      elevation: 8.0,
-    );
-  }
-
   Future<void> _onPopUpMenuClick(int item) async {
     switch (item) {
       case 0:
@@ -273,5 +334,23 @@ class CurrentWeatherPage extends GetView<CurrentWeatherController>
         await Get.toNamed(SavedWeatherPage.id);
         break;
     }
+  }
+
+  getInfoWidget(
+      {required IconData icon, required String key, required String value}) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12), color: AppColor.alphaGrey),
+      child: Column(
+        children: [
+          Icon(icon),
+          vSpace,
+          Text(key, style: AppTextStyles.textStyleBoldBodyMedium),
+          vSpace,
+          Text(value, style: AppTextStyles.textStyleBoldBodyMedium)
+        ],
+      ),
+    );
   }
 }

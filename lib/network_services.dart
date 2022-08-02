@@ -120,9 +120,13 @@ class NetworkServices {
 
   static Future<GeoData> getGeoDataFromCurrentLocation(LatLng coord) async {
     return Geocoder2.getDataFromCoordinates(
-        latitude: coord.latitude,
-        longitude: coord.longitude,
-        googleMapApiKey: AppConstants.googleMapApiKey);
+            latitude: coord.latitude,
+            longitude: coord.longitude,
+            googleMapApiKey: AppConstants.googleMapApiKey)
+        .catchError((onError) {
+      AppPopUps.showDialogContent(
+          title: 'Error', description: 'Failed to connect');
+    });
   }
 
   static Future<LatLng> getUserLocation() async {
