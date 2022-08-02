@@ -15,8 +15,14 @@ String formatDateTime(DateTime? dateTime) {
   return DateFormat('dd-MM-yyyy').format(dateTime ?? DateTime.now());
 }
 
-String formatUnixDateTime({required int? unixDateTime}) {
-  return "";
+String getHourFromUnixTime({required int? unixDateTime}) {
+  return DateFormat('dd/MM\nhh a').format(
+      DateTime.fromMillisecondsSinceEpoch((unixDateTime ?? 00000) * 1000));
+}
+
+String getDateFromUnix({required int? unixDateTime}) {
+  return DateFormat('dd/MM').format(
+      DateTime.fromMillisecondsSinceEpoch((unixDateTime ?? 00000) * 1000));
 }
 
 int daysDifference({required DateTime from, required DateTime to}) {
@@ -40,6 +46,7 @@ myAppBar(
     actions: actions ?? [],
     automaticallyImplyLeading: goBack,
     backgroundColor: backGroundColor,
+    foregroundColor: Colors.transparent,
     title: Text(
       title ?? "",
       style: AppTextStyles.textStyleBoldBodyMedium,

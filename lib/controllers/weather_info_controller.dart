@@ -7,7 +7,7 @@ import 'package:weather_app/common/user_defaults.dart';
 import 'package:weather_app/models/one_call_weather_response_model.dart';
 import 'package:weather_app/network_services.dart';
 
-class CurrentWeatherController extends GetxController {
+class WeatherInfoController extends GetxController {
   RxBool isLoading = false.obs;
 
   var oneCallWeatherResponseModel = Rxn<OneCallWeatherResponseModel>().obs;
@@ -17,35 +17,26 @@ class CurrentWeatherController extends GetxController {
 
   var backGroundWeatherType = WeatherType.hazy.obs;
 
-  Future<void> getWeatherFromApi({bool refresh = false}) async {
+  Future<void> getWeatherFromApi(
+      {required LatLng latLng,
+      required String cityName,
+      bool refresh = false}) async {
     weatherUnit.value = await UserDefaults.getWeatherUnit() ?? "°C";
-    LatLng coord = await NetworkServices.getUserLocation();
-    GeoData geoData =
-        await NetworkServices.getGeoDataFromCurrentLocation(coord);
-    cityName.value = geoData.city;
+    LatLng coord = latLng;
+    this.cityName.value = cityName;
 
-    ///five days weather from now checking from sharedPref
+    isLoading.value = true;
+
+    ///getting weather data from the server
     oneCallWeatherResponseModel.value.value =
-        await UserDefaults.getOneCallWeather();
+        await NetworkServices.getOneCallWeatherFromLatLng(
+            latLng: coord, selectedTemperatureUnit: "°C");
+    _changeBackgroundAccordingToWeather(oneCallWeatherResponseModel
+            .value.value?.current?.weather?[0].id
+            ?.toInt() ??
+        0);
 
-    if ((oneCallWeatherResponseModel.value.value == null) || refresh) {
-      isLoading.value = true;
-
-      ///getting weather data from the server
-      oneCallWeatherResponseModel.value.value =
-          await NetworkServices.getOneCallWeatherFromLatLng(
-              latLng: coord, selectedTemperatureUnit: "°C");
-      _changeBackgroundAccordingToWeather(oneCallWeatherResponseModel
-              .value.value?.current?.weather?[0].id
-              ?.toInt() ??
-          0);
-
-      ///saving to shared pref
-      bool result = await UserDefaults.saveOneCallWeather(
-          oneCallWeatherResponseModel.value.value!);
-      printWrapped("weather save result $result");
-      isLoading.value = false;
-    }
+    isLoading.value = false;
   }
 
   void _changeBackgroundAccordingToWeather(int id) {

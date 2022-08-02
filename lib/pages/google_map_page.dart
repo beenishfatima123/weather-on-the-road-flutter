@@ -1,16 +1,11 @@
-import 'dart:async';
-import 'dart:typed_data';
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:custom_map_markers/custom_map_markers.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
-import 'package:weather_app/common/app_pop_ups.dart';
 import 'package:weather_app/common/helpers.dart';
 import 'package:weather_app/network_services.dart';
+
 import '../common/loading_widget.dart';
 import '../common/spaces_boxes.dart';
 import '../common/styles.dart';
@@ -41,7 +36,7 @@ class GoogleMapPage extends GetView<MyGoogleMapController> {
             child: Stack(
               children: [
                 CustomGoogleMapMarkerBuilder(
-                  screenshotDelay: const Duration(milliseconds: 300),
+                  screenshotDelay: const Duration(seconds: 1),
                   customMarkers: controller.customMarkers,
                   builder: (BuildContext context, Set<Marker>? markers) {
                     if (markers != null) {
@@ -54,45 +49,80 @@ class GoogleMapPage extends GetView<MyGoogleMapController> {
                 ),
                 Obx(() {
                   controller.markers.value;
-                  return GoogleMap(
-                    mapType: MapType.normal,
-                    trafficEnabled: false,
-                    buildingsEnabled: false,
-                    myLocationEnabled: true,
-                    initialCameraPosition: controller.initialPosition,
-                    markers: controller.markers,
-                    polylines: controller.polylines,
-                    onMapCreated: controller.onMapCreated,
-                    onLongPress: (LatLng latLng) async {
-                      controller.isLoading.value = true;
-                      CurrentWeatherResponseModel? weatherResponseModel =
-                          await NetworkServices
-                                  .getCurrentWeatherConditionFromLatLng(
-                                      latLng: latLng,
-                                      showAlert: true,
-                                      selectedTemperatureUnit: controller
-                                          .selectedTemperatureUnit.value) ??
-                              CurrentWeatherResponseModel();
+                  return Column(
+                    children: [
+                      Expanded(
+                          child: GoogleMap(
+                        mapType: MapType.normal,
+                        trafficEnabled: false,
+                        buildingsEnabled: false,
+                        myLocationEnabled: true,
+                        initialCameraPosition: controller.initialPosition,
+                        markers: controller.markers,
+                        polylines: controller.polylines,
+                        onMapCreated: controller.onMapCreated,
+                        onLongPress: (LatLng latLng) async {
+                          controller.isLoading.value = true;
+                          CurrentWeatherResponseModel? weatherResponseModel =
+                              await NetworkServices
+                                      .getCurrentWeatherConditionFromLatLng(
+                                          latLng: latLng,
+                                          showAlert: true,
+                                          selectedTemperatureUnit: controller
+                                              .selectedTemperatureUnit.value) ??
+                                  CurrentWeatherResponseModel();
 
-                      controller.customMarkers.add(
-                        MarkerData(
-                          marker: Marker(
-                              onTap: () {
-                                controller.openBottomSheet(
-                                    weather: weatherResponseModel);
-                              },
-                              markerId: MarkerId(
-                                  (weatherResponseModel.id ?? 0).toString()),
-                              position: LatLng(
-                                  weatherResponseModel.coord?.lat ?? 0.0,
-                                  weatherResponseModel.coord?.lon ?? 0.0)),
-                          child: MarkerInfo(
-                              getBitmapImage: (img, model) {},
-                              weatherResponseModel: weatherResponseModel),
+                          controller.customMarkers.add(
+                            MarkerData(
+                              marker: Marker(
+                                  onTap: () {
+                                    controller.openBottomSheet(
+                                        weather: weatherResponseModel);
+                                  },
+                                  markerId: MarkerId(
+                                      (weatherResponseModel.id ?? 0)
+                                          .toString()),
+                                  position: LatLng(
+                                      weatherResponseModel.coord?.lat ?? 0.0,
+                                      weatherResponseModel.coord?.lon ?? 0.0)),
+                              child: MarkerInfo(
+                                  getBitmapImage: (img, model) {},
+                                  weatherResponseModel: weatherResponseModel),
+                            ),
+                          );
+                          controller.isLoading.value = false;
+                        },
+                      )),
+                      InkWell(
+                        onTap: () {},
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 12, horizontal: 16),
+                          decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  topRight: Radius.circular(10)),
+                              color: AppColor.green),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Save route',
+                                style: AppTextStyles.textStyleBoldBodyMedium
+                                    .copyWith(color: AppColor.whiteColor),
+                              ),
+                              hSpace,
+                              const Icon(
+                                Icons.data_saver_on,
+                                color: AppColor.whiteColor,
+                                size: 18,
+                              )
+                            ],
+                          ),
                         ),
-                      );
-                      controller.isLoading.value = false;
-                    },
+                      ),
+                    ],
                   );
                 }),
                 if (controller.isLoading.isTrue) LoadingWidget(),

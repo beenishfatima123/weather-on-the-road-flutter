@@ -25,6 +25,8 @@ import 'package:weather_app/common/styles.dart';
 import 'package:weather_app/models/curent_weather_response_model.dart';
 import 'package:weather_app/my_application.dart';
 import 'package:weather_app/network_services.dart';
+import 'package:weather_app/pages/current_weather_page.dart';
+import 'package:weather_app/pages/weather_info_page.dart';
 
 import '../common/app_alert_bottom_sheet.dart';
 import '../common/common_widgets.dart';
@@ -203,7 +205,12 @@ class MyGoogleMapController extends GetxController {
   }
 
   void openBottomSheet({required CurrentWeatherResponseModel? weather}) {
-    String sunRiseTime = DateFormat('hh:mm:ss').format(
+    Get.toNamed(WeatherInfoPage.id, arguments: [
+      LatLng(weather?.coord?.lat ?? 0.0, weather?.coord?.lon ?? 0.0),
+      weather?.name ?? '-'
+    ]);
+
+    /* String sunRiseTime = DateFormat('hh:mm:ss').format(
         DateTime.fromMillisecondsSinceEpoch(
             (weather?.sys?.sunrise!.toInt())! * (1000)));
     String sunSetTime = DateFormat('hh:mm:ss').format(
@@ -302,7 +309,7 @@ class MyGoogleMapController extends GetxController {
           ],
         ),
       ),
-    );
+    );*/
   }
 
   void animateCameraToBounds() {

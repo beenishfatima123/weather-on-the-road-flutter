@@ -1,9 +1,11 @@
 import 'package:get/get.dart';
 import 'package:weather_app/controllers/current_weather_controller.dart';
 import 'package:weather_app/controllers/pick_place_controller.dart';
+import 'package:weather_app/controllers/weather_info_controller.dart';
 import 'package:weather_app/pages/current_weather_page.dart';
 import 'package:weather_app/pages/google_map_page.dart';
 import 'package:weather_app/pages/pick_places_page.dart';
+import 'package:weather_app/pages/weather_info_page.dart';
 import '../controllers/google_map_controller.dart';
 
 appRoutes() {
@@ -25,12 +27,26 @@ appRoutes() {
           );
         })),
     GetPage(
-        name: CurrentWeatherPage.id,
-        page: () => CurrentWeatherPage(),
-        binding: BindingsBuilder(() {
+      name: CurrentWeatherPage.id,
+      page: () => CurrentWeatherPage(),
+      binding: BindingsBuilder(
+        () {
           Get.lazyPut<CurrentWeatherController>(
             () => CurrentWeatherController(),
           );
-        })),
+        },
+      ),
+    ),
+    GetPage(
+      name: WeatherInfoPage.id,
+      page: () => WeatherInfoPage(),
+      binding: BindingsBuilder(
+        () {
+          Get.lazyPut<WeatherInfoController>(
+            () => WeatherInfoController(),
+          );
+        },
+      ),
+    ),
   ];
 }

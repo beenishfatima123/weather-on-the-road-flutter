@@ -20,10 +20,10 @@ class AppColor {
 }
 
 class AppTextStyles {
-  static final _fontBold = GoogleFonts.roboto(
+  static final _fontBold = GoogleFonts.abel(
       textStyle: const TextStyle(
           fontWeight: FontWeight.bold, color: AppColor.blackColor));
-  static final _fontNormal = GoogleFonts.roboto(
+  static final _fontNormal = GoogleFonts.abel(
       textStyle: const TextStyle(
           fontWeight: FontWeight.normal, color: AppColor.blackColor));
 

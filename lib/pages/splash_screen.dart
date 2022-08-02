@@ -1,9 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:geocoder2/geocoder2.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:weather_app/network_services.dart';
 import 'package:weather_app/pages/current_weather_page.dart';
 import 'package:weather_app/pages/pick_places_page.dart';
 
+import '../common/constants.dart';
 import 'google_map_page.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -20,15 +25,26 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    Timer(const Duration(seconds: 3), () => {gotoRelevantScreenOnUserType()});
+    Timer(const Duration(seconds: 2), () => {gotoRelevantScreenOnUserType()});
   }
 
-  void gotoRelevantScreenOnUserType() {
+  void gotoRelevantScreenOnUserType() async {
     Get.offNamed(CurrentWeatherPage.id);
-    /*if (UserDefaults.getUserSession() != null) {
-      Get.offNamed(DashBoardPage.id);
+
+    /* var result = await NetworkServices.checkLocationPermission();
+
+    if (result) {
+      LatLng currentLocationLatLng = await NetworkServices.getUserLocation();
+      GeoData geoData = await NetworkServices.getGeoDataFromCurrentLocation(
+          currentLocationLatLng);
+
+      ///getting current city Name;
+      String cityName = geoData.city;
+      LatLng latLng = LatLng(geoData.latitude, geoData.longitude);
+      Get.offNamed(CurrentWeatherPage.id, arguments: [latLng, cityName]);
     } else {
-      Get.offNamed(LoginPage.id);
+      await Geolocator.requestPermission();
+      gotoRelevantScreenOnUserType();
     }*/
   }
 

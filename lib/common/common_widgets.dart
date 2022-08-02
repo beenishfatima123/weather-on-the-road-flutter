@@ -492,8 +492,7 @@ class _NetworkCircularImageState extends State<NetworkCircularImage> {
       errorWidget: (context, url, error) {
         printWrapped(error.toString());
         return CircleAvatar(
-          backgroundImage:
-              const AssetImage('assets/images/place_your_image.png'),
+          backgroundImage: const AssetImage('assets/images/logo.png'),
           radius: widget.radius,
         );
       },
@@ -504,7 +503,7 @@ class _NetworkCircularImageState extends State<NetworkCircularImage> {
   void initState() {
     super.initState();
     if (widget.clearCache) {
-      //DefaultCacheManager().removeFile(widget.url);
+      // DefaultCacheManager().removeFile(widget.url);
     }
   }
 }

@@ -8,6 +8,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:weather_app/common/common_widgets.dart';
 import 'package:weather_app/common/helpers.dart';
 import 'package:weather_app/common/styles.dart';
+import 'package:weather_app/controllers/weather_info_controller.dart';
 import 'package:weather_app/models/five_day_weather_forecast_response_model.dart';
 import 'package:weather_app/models/one_call_weather_response_model.dart';
 import 'package:weather_app/my_application.dart';
@@ -19,17 +20,21 @@ import '../common/spaces_boxes.dart';
 import '../controllers/current_weather_controller.dart';
 import '../network_services.dart';
 
-class CurrentWeatherPage extends GetView<CurrentWeatherController>
+class WeatherInfoPage extends GetView<WeatherInfoController>
     with WeatherWidgetMixin {
-  CurrentWeatherPage({Key? key}) : super(key: key);
-  static const id = '/CurrentWeatherPage';
+  WeatherInfoPage({Key? key}) : super(key: key);
+  static const id = '/WeatherInfoPage';
+  LatLng? latLng = Get.arguments?[0];
+  String? cityName = Get.arguments?[1];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GetX<CurrentWeatherController>(
+      body: GetX<WeatherInfoController>(
         initState: (state) {
-          controller.getWeatherFromApi();
+          if (latLng != null && cityName != null) {
+            controller.getWeatherFromApi(cityName: cityName!, latLng: latLng!);
+          }
         },
         builder: (_) {
           return SafeArea(
@@ -52,7 +57,12 @@ class CurrentWeatherPage extends GetView<CurrentWeatherController>
                   width: Get.width,
                   child: RefreshIndicator(
                     onRefresh: () {
-                      controller.getWeatherFromApi(refresh: true);
+                      if (latLng != null && cityName != null) {
+                        controller.getWeatherFromApi(
+                            cityName: cityName!,
+                            latLng: latLng!,
+                            refresh: true);
+                      }
                       return Future.delayed(const Duration(milliseconds: 100));
                     },
                     child: SingleChildScrollView(
@@ -216,32 +226,7 @@ class CurrentWeatherPage extends GetView<CurrentWeatherController>
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 80,
-                  child: myAppBar(
-                    backGroundColor: Colors.transparent,
-                    goBack: false,
-                    actions: [
-                      // This button presents popup menu items.
-                      PopupMenuButton<int>(
-                          color: AppColor.whiteColor,
-                          onSelected: (int item) {
-                            _onPopUpMenuClick(item);
-                          },
-                          itemBuilder: (BuildContext context) =>
-                              <PopupMenuEntry<int>>[
-                                const PopupMenuItem<int>(
-                                  value: 0,
-                                  child: Text('Route weather'),
-                                ),
-                                const PopupMenuItem<int>(
-                                  value: 1,
-                                  child: Text('Saved weather'),
-                                ),
-                              ])
-                    ],
-                  ),
-                ),
+
                 if (controller.isLoading.isTrue) LoadingWidget(),
               ],
             ),

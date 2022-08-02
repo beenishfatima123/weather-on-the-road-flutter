@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_app/models/curent_weather_response_model.dart';
 import 'package:weather_app/models/five_day_weather_forecast_response_model.dart';
+import 'package:weather_app/models/one_call_weather_response_model.dart';
 import 'dart:convert';
 
 import 'helpers.dart';
@@ -46,6 +47,34 @@ class UserDefaults {
       Map<String, dynamic> json = jsonDecode(result);
       model = CurrentWeatherResponseModel.fromJson(json);
       printWrapped("current weather returned");
+    }
+    return model;
+  }
+
+  static Future<bool> saveWeatherUnit(String value) async {
+    return await sharedPreferences?.setString('weatherUnit', value) ?? false;
+  }
+
+  static Future<String?> getWeatherUnit() async {
+    return sharedPreferences?.getString('weatherUnit');
+  }
+
+  ///one call weather api response
+  static Future<bool> saveOneCallWeather(
+      OneCallWeatherResponseModel model) async {
+    String weather = json.encode(model.toJson());
+    printWrapped("one call weather saved....");
+    return await sharedPreferences?.setString('oneCallWeather', weather) ??
+        false;
+  }
+
+  static Future<OneCallWeatherResponseModel?> getOneCallWeather() async {
+    OneCallWeatherResponseModel? model;
+    String? result = sharedPreferences?.getString('oneCallWeather');
+    if (result != null) {
+      Map<String, dynamic> json = jsonDecode(result);
+      model = OneCallWeatherResponseModel.fromJson(json);
+      printWrapped("one call weather returned");
     }
     return model;
   }
