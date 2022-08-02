@@ -89,4 +89,22 @@ mixin WeatherWidgetMixin {
       ),
     );
   }
+
+  getInfoWidget(
+      {required IconData icon, required String key, required String value}) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12), color: AppColor.alphaGrey),
+      child: Column(
+        children: [
+          Icon(icon),
+          vSpace,
+          Text(key, style: AppTextStyles.textStyleBoldBodyMedium),
+          vSpace,
+          Text(value, style: AppTextStyles.textStyleBoldBodyMedium)
+        ],
+      ),
+    );
+  }
 }

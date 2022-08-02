@@ -103,14 +103,7 @@ class CurrentWeatherPage extends GetView<CurrentWeatherController>
                                     children: [
                                       vSpace,
                                       Text(
-                                        (controller
-                                                .oneCallWeatherResponseModel
-                                                .value
-                                                .value
-                                                ?.current
-                                                ?.weather?[0]
-                                                .description ??
-                                            "-"),
+                                        ('Current weather'),
                                         style: AppTextStyles
                                             .textStyleNormalBodySmall
                                             .copyWith(
@@ -284,7 +277,9 @@ class CurrentWeatherPage extends GetView<CurrentWeatherController>
                                 )
                               ],
                             ),
-                          )
+                          ),
+                          vSpace,
+                          vSpace,
                         ],
                       ),
                     ),
@@ -334,23 +329,5 @@ class CurrentWeatherPage extends GetView<CurrentWeatherController>
         await Get.toNamed(SavedWeatherPage.id);
         break;
     }
-  }
-
-  getInfoWidget(
-      {required IconData icon, required String key, required String value}) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12), color: AppColor.alphaGrey),
-      child: Column(
-        children: [
-          Icon(icon),
-          vSpace,
-          Text(key, style: AppTextStyles.textStyleBoldBodyMedium),
-          vSpace,
-          Text(value, style: AppTextStyles.textStyleBoldBodyMedium)
-        ],
-      ),
-    );
   }
 }

@@ -16,7 +16,7 @@ String formatDateTime(DateTime? dateTime) {
 }
 
 String getHourFromUnixTime({required int? unixDateTime}) {
-  return DateFormat('dd/MM\nhh a').format(
+  return DateFormat('hh a').format(
       DateTime.fromMillisecondsSinceEpoch((unixDateTime ?? 00000) * 1000));
 }
 
@@ -36,13 +36,14 @@ int daysDifference({required DateTime from, required DateTime to}) {
 myAppBar(
     {String? title,
     Color backGroundColor = AppColor.whiteColor,
+    Color iconColor = AppColor.blackColor,
     List<Widget>? actions,
     BuildContext? context,
     bool goBack = true,
     onBacKTap}) {
   return AppBar(
     elevation: 0,
-    iconTheme: const IconThemeData(color: AppColor.blackColor),
+    iconTheme: IconThemeData(color: iconColor),
     actions: actions ?? [],
     automaticallyImplyLeading: goBack,
     backgroundColor: backGroundColor,

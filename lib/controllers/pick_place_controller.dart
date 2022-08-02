@@ -12,7 +12,6 @@ class PickPlaceController extends GetxController {
   PickResult? endPickResult;
 
   void pickUpPlace({required bool isForStart}) async {
-    isLoading.value = true;
     Navigator.push(
       myContext!,
       MaterialPageRoute(

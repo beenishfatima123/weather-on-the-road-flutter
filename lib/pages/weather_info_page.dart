@@ -1,10 +1,12 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_weather_bg_null_safety/flutter_weather_bg.dart';
 import 'package:geocoder2/geocoder2.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:weather_app/common/common_widgets.dart';
 import 'package:weather_app/common/helpers.dart';
 import 'package:weather_app/common/styles.dart';
@@ -117,14 +119,7 @@ class WeatherInfoPage extends GetView<WeatherInfoController>
                                     children: [
                                       vSpace,
                                       Text(
-                                        (controller
-                                                .oneCallWeatherResponseModel
-                                                .value
-                                                .value
-                                                ?.current
-                                                ?.weather?[0]
-                                                .description ??
-                                            "-"),
+                                        ('Current weather'),
                                         style: AppTextStyles
                                             .textStyleNormalBodySmall
                                             .copyWith(
@@ -214,6 +209,83 @@ class WeatherInfoPage extends GetView<WeatherInfoController>
                                                 weatherUnit: controller
                                                     .weatherUnit.value);
                                           }),
+                                      vSpace,
+                                      vSpace,
+                                      vSpace,
+                                      StaggeredGrid.count(
+                                        crossAxisCount: 2,
+                                        crossAxisSpacing: 10,
+                                        mainAxisSpacing: 10,
+                                        children: [
+                                          getInfoWidget(
+                                            icon: Icons.hotel_class_outlined,
+                                            key: "Temp.",
+                                            value:
+                                                ("${controller.oneCallWeatherResponseModel.value.value?.current?.temp?.toInt() ?? 0} ${controller.weatherUnit.value}"),
+                                          ),
+                                          getInfoWidget(
+                                            icon: Icons.air,
+                                            key: "Humidity",
+                                            value:
+                                                ("${controller.oneCallWeatherResponseModel.value.value?.current?.humidity?.toInt() ?? 0} %"),
+                                          ),
+                                          getInfoWidget(
+                                            icon: Icons.remove_red_eye_outlined,
+                                            key: "Visibility",
+                                            value:
+                                                ("${controller.oneCallWeatherResponseModel.value.value?.current?.visibility ?? 0} meter "),
+                                          ),
+                                          getInfoWidget(
+                                            icon: Icons.compress,
+                                            key: "Pressure",
+                                            value:
+                                                ("${controller.oneCallWeatherResponseModel.value.value?.current?.pressure ?? 0}  hPa"),
+                                          ),
+                                          getInfoWidget(
+                                            icon: Icons.compress,
+                                            key: "Wind Speed",
+                                            value:
+                                                ("${controller.oneCallWeatherResponseModel.value.value?.current?.windSpeed ?? 0}  m/s"),
+                                          ),
+                                          getInfoWidget(
+                                            icon: Icons.cloud,
+                                            key: "Clouds",
+                                            value:
+                                                ("${controller.oneCallWeatherResponseModel.value.value?.current?.clouds ?? 0}  %"),
+                                          ),
+                                          getInfoWidget(
+                                            icon: Icons.sunny,
+                                            key: "Sun rise",
+                                            value: DateFormat('hh:mm:ss a').format(
+                                                DateTime.fromMillisecondsSinceEpoch(
+                                                    (controller
+                                                                    .oneCallWeatherResponseModel
+                                                                    .value
+                                                                    .value
+                                                                    ?.current
+                                                                    ?.sunrise ??
+                                                                0.0)
+                                                            .toInt() *
+                                                        (1000))),
+                                          ),
+                                          getInfoWidget(
+                                            icon: Icons.nightlight,
+                                            key: "Sun set",
+                                            value: DateFormat('hh:mm:ss a').format(
+                                                DateTime.fromMillisecondsSinceEpoch(
+                                                    (controller
+                                                                    .oneCallWeatherResponseModel
+                                                                    .value
+                                                                    .value
+                                                                    ?.current
+                                                                    ?.sunset ??
+                                                                0.0)
+                                                            .toInt() *
+                                                        (1000))),
+                                          )
+                                        ],
+                                      ),
+                                      vSpace,
                                       vSpace,
                                     ],
                                   ),
