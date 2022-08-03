@@ -250,30 +250,30 @@ class CurrentWeatherPage extends GetView<CurrentWeatherController>
                                 getInfoWidget(
                                   icon: Icons.sunny,
                                   key: "Sun rise",
-                                  value: DateFormat('hh:mm:ss a').format(
-                                      DateTime.fromMillisecondsSinceEpoch(
-                                          (controller
-                                                  .oneCallWeatherResponseModel
-                                                  .value
-                                                  .value
-                                                  ?.current
-                                                  ?.sunrise!
-                                                  .toInt())! *
-                                              (1000))),
+                                  value: DateFormat('hh:mm:ss a').format(DateTime
+                                      .fromMillisecondsSinceEpoch((controller
+                                                      .oneCallWeatherResponseModel
+                                                      .value
+                                                      .value
+                                                      ?.current
+                                                      ?.sunrise ??
+                                                  0.0)
+                                              .toInt() *
+                                          (1000))),
                                 ),
                                 getInfoWidget(
                                   icon: Icons.nightlight,
                                   key: "Sun set",
-                                  value: DateFormat('hh:mm:ss a').format(
-                                      DateTime.fromMillisecondsSinceEpoch(
-                                          (controller
-                                                  .oneCallWeatherResponseModel
-                                                  .value
-                                                  .value
-                                                  ?.current
-                                                  ?.sunset!
-                                                  .toInt())! *
-                                              (1000))),
+                                  value: DateFormat('hh:mm:ss a').format(DateTime
+                                      .fromMillisecondsSinceEpoch((controller
+                                                      .oneCallWeatherResponseModel
+                                                      .value
+                                                      .value
+                                                      ?.current
+                                                      ?.sunset ??
+                                                  0.0)
+                                              .toInt() *
+                                          (1000))),
                                 )
                               ],
                             ),
