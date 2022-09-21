@@ -2,19 +2,12 @@ import 'package:custom_map_markers/custom_map_markers.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
-import 'package:weather_app/common/app_pop_ups.dart';
 import 'package:weather_app/common/helpers.dart';
 import 'package:weather_app/controllers/route_weather_info_controller.dart';
 import 'package:weather_app/models/custom_weather_info_model.dart';
-import 'package:weather_app/models/my_lat_lng.dart';
 import 'package:weather_app/network_services.dart';
 
-import '../common/hive_db.dart';
 import '../common/loading_widget.dart';
-import '../common/spaces_boxes.dart';
-import '../common/styles.dart';
-import '../controllers/google_map_controller.dart';
 import '../models/curent_weather_response_model.dart';
 import 'marker_info.dart';
 

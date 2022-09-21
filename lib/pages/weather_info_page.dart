@@ -3,24 +3,17 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_weather_bg_null_safety/flutter_weather_bg.dart';
-import 'package:geocoder2/geocoder2.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:weather_app/common/common_widgets.dart';
-import 'package:weather_app/common/helpers.dart';
 import 'package:weather_app/common/styles.dart';
 import 'package:weather_app/controllers/weather_info_controller.dart';
-import 'package:weather_app/models/five_day_weather_forecast_response_model.dart';
-import 'package:weather_app/models/one_call_weather_response_model.dart';
 import 'package:weather_app/my_application.dart';
 import 'package:weather_app/pages/pick_places_page.dart';
 import 'package:weather_app/pages/weather_page_widgets.dart';
 
 import '../../../../common/loading_widget.dart';
 import '../common/spaces_boxes.dart';
-import '../controllers/current_weather_controller.dart';
-import '../network_services.dart';
 
 class WeatherInfoPage extends GetView<WeatherInfoController>
     with WeatherWidgetMixin {
